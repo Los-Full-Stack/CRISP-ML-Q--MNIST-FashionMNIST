@@ -8,18 +8,18 @@ import io, base64
 
 st.set_page_config(page_title="CNN Inference Portal", layout="wide", page_icon="🧠")
 
-# ── Palette ──
-BG = "#070b18"
-SURFACE = "#0e1428"
-SURFACE2 = "#161d3a"
-BORDER = "#1c2648"
-PRI = "#38bdf8"
-SEC = "#818cf8"
-SUCCESS = "#22c55e"
-WARN = "#eab308"
-DANGER = "#ef4444"
-TEXT = "#e2e8f0"
-MUTED = "#64748b"
+# ── Palette (suave, moderna) ──
+BG = "#0c0c18"
+SURFACE = "#14142a"
+SURFACE2 = "#1c1c3a"
+BORDER = "#2a2a50"
+PRI = "#67e8f9"
+SEC = "#c084fc"
+SUCCESS = "#34d399"
+WARN = "#fbbf24"
+DANGER = "#f87171"
+TEXT = "#f1f5f9"
+MUTED = "#94a3b8"
 
 st.markdown(f"""
 <style>
@@ -27,22 +27,62 @@ st.markdown(f"""
     * {{ font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }}
     .stApp {{ background: {BG}; }}
     .block-container {{ max-width: 90% !important; padding-top: 0.8rem !important; padding-bottom: 0.8rem !important; }}
-    .main > div {{ background: transparent; border: none; padding: 0; margin: 0; }}
+    .main > div {{ background: transparent; border: none; padding: 0; margin: 0; animation: fadeUp 0.3s ease-out; }}
     section[data-testid="stSidebar"] {{ display: none; }}
+    header[data-testid="stHeader"] {{ display: none; }}
+    div[data-testid="stToolbar"] {{ display: none; }}
+    div[data-testid="stDecoration"] {{ display: none; }}
+    #MainMenu {{ display: none; }}
+    .stAppDeployButton {{ display: none !important; }}
 
-    .stButton button {{
-        background: linear-gradient(135deg, {PRI} 0%, {SEC} 100%);
-        color: white; font-weight: 600; border: none; border-radius: 10px;
-        padding: 0.45rem 1.6rem; font-size: 0.9rem; transition: all 0.2s ease;
-        box-shadow: 0 4px 16px rgba(56,189,248,0.2); width: 100%;
+    @keyframes fadeUp {{
+        from {{ opacity: 0; transform: translateY(16px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
     }}
-    .stButton button:hover {{ transform: translateY(-1px); box-shadow: 0 6px 24px rgba(56,189,248,0.35); }}
+    .stApp > header {{ animation: fadeUp 0.35s ease-out; }}
+
+    /* ── Primary button (gradient) ── */
+    .stButton button {{
+        background: linear-gradient(135deg, {PRI}dd 0%, {SEC}dd 100%);
+        color: #0c0c18; font-weight: 700; border: none; border-radius: 10px;
+        padding: 0.45rem 1.6rem; font-size: 0.9rem; transition: all 0.2s ease;
+        box-shadow: 0 4px 20px rgba(103,232,249,0.15); width: 100%;
+    }}
+    .stButton button:hover {{
+        transform: translateY(-2px); box-shadow: 0 6px 28px rgba(103,232,249,0.3);
+    }}
+    .stButton button:active {{ transform: translateY(0); }}
+
+    /* ── Secondary button (outlined) ── */
+    .sec-btn button {{
+        background: transparent !important; border: 1px solid {BORDER} !important;
+        color: {MUTED} !important; font-weight: 500 !important;
+        box-shadow: none !important; padding: 0.3rem 1rem !important;
+        font-size: 0.8rem !important;
+    }}
+    .sec-btn button:hover {{
+        border-color: {PRI}88 !important; color: {TEXT} !important;
+        box-shadow: none !important; transform: none !important;
+    }}
+
+    /* ── Danger button (for reset) ── */
+    .danger-btn button {{
+        background: transparent !important; border: 1px solid {DANGER}44 !important;
+        color: {DANGER}bb !important; font-weight: 500 !important;
+        box-shadow: none !important; padding: 0.3rem 1rem !important;
+        font-size: 0.8rem !important;
+    }}
+    .danger-btn button:hover {{
+        border-color: {DANGER} !important; color: {DANGER} !important;
+        background: rgba(248,113,113,0.06) !important;
+        box-shadow: none !important; transform: none !important;
+    }}
 
     .stFileUploader section {{
         border: 2px dashed {BORDER}; border-radius: 12px; padding: 1rem 1.4rem;
         background: {SURFACE2}44; transition: all 0.2s;
     }}
-    .stFileUploader section:hover {{ border-color: {PRI}66; background: rgba(56,189,248,0.04); }}
+    .stFileUploader section:hover {{ border-color: {PRI}66; background: rgba(103,232,249,0.04); }}
     .stFileUploader section ul {{ padding: 0; margin: 0.4rem 0 0 0; }}
     .stFileUploader section ul li {{
         background: {SURFACE}; border: 1px solid {BORDER}; border-radius: 8px;
@@ -57,6 +97,7 @@ st.markdown(f"""
     .card {{
         background: {SURFACE}; border: 1px solid {BORDER}; border-radius: 14px;
         padding: 1.1rem 1.5rem; margin-bottom: 0.8rem;
+        animation: fadeUp 0.3s ease-out;
     }}
     .card-title {{
         font-size: 1rem; font-weight: 600; color: {TEXT};
@@ -70,11 +111,11 @@ st.markdown(f"""
         background: linear-gradient(145deg, {SURFACE2} 0%, {SURFACE} 100%);
         border: 1px solid {BORDER}; border-radius: 18px;
         padding: 2.2rem 1.5rem; text-align: center; cursor: pointer;
-        transition: all 0.3s ease; height: 100%;
+        transition: all 0.3s ease; height: 100%; animation: fadeUp 0.4s ease-out;
     }}
     .sel-card:hover {{
         border-color: {PRI}; transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(56,189,248,0.08);
+        box-shadow: 0 12px 40px rgba(103,232,249,0.06);
     }}
     .sel-card .ico {{ font-size: 3.8rem; margin-bottom: 0.6rem; }}
     .sel-card .nm {{ font-size: 1.3rem; font-weight: 700; color: {TEXT}; margin-bottom: 0.3rem; }}
@@ -91,7 +132,7 @@ st.markdown(f"""
         background: {SURFACE2}55; border-radius: 10px; border: 1px solid {BORDER};
     }}
     .kpi .nm {{ font-size: 1.8rem; font-weight: 800; color: #fff; line-height: 1.1; }}
-    .kpi .nm.blue {{ color: {PRI}; }}
+    .kpi .nm.accent {{ color: {PRI}; }}
     .kpi .nm.green {{ color: {SUCCESS}; }}
     .kpi .nm.yellow {{ color: {WARN}; }}
     .kpi .nm.red {{ color: {DANGER}; }}
@@ -103,7 +144,7 @@ st.markdown(f"""
         border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 0.5rem;
     }}
     .rl {{ font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; color: {MUTED}; margin-bottom: 0.1rem; }}
-    .rcat {{ display: inline-block; background: rgba(56,189,248,0.12); color: {PRI}; font-weight: 600; font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 6px; }}
+    .rcat {{ display: inline-block; background: rgba(103,232,249,0.1); color: {PRI}; font-weight: 600; font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 6px; }}
     .rval {{ font-size: 1.3rem; font-weight: 700; color: {TEXT}; line-height: 1.2; }}
     .rval.green {{ color: {SUCCESS}; }} .rval.yellow {{ color: {WARN}; }} .rval.red {{ color: {DANGER}; }}
     .rbar {{ width:100%; height:5px; background:{BG}; border-radius:3px; overflow:hidden; margin:0.15rem 0 0.2rem 0; }}
@@ -119,13 +160,11 @@ st.markdown(f"""
     .msg {{
         font-size: 0.85rem; padding: 0.35rem 0.8rem; border-radius: 8px; margin-top: 0.3rem;
     }}
-    .msg.ok {{ background: rgba(34,197,94,0.08); color: {SUCCESS}; border: 1px solid rgba(34,197,94,0.15); }}
-    .msg.info {{ background: rgba(56,189,248,0.08); color: {PRI}; border: 1px solid rgba(56,189,248,0.15); }}
-    .msg.warn {{ background: rgba(234,179,8,0.08); color: {WARN}; border: 1px solid rgba(234,179,8,0.15); }}
+    .msg.ok {{ background: rgba(52,211,153,0.08); color: {SUCCESS}; border: 1px solid rgba(52,211,153,0.15); }}
+    .msg.info {{ background: rgba(103,232,249,0.08); color: {PRI}; border: 1px solid rgba(103,232,249,0.15); }}
+    .msg.warn {{ background: rgba(251,191,36,0.08); color: {WARN}; border: 1px solid rgba(251,191,36,0.15); }}
 
-    .hero {{
-        text-align: center; padding: 1.2rem 0 0.3rem 0;
-    }}
+    .hero {{ text-align: center; padding: 1.2rem 0 0.3rem 0; animation: fadeUp 0.4s ease-out; }}
     .hero h1 {{
         font-size: 2.8rem; font-weight: 800; color: {TEXT};
         letter-spacing: -0.02em; margin: 0; line-height: 1.2;
@@ -134,22 +173,22 @@ st.markdown(f"""
     }}
     .hero p {{ color: {MUTED}; font-size: 0.95rem; margin: 0.2rem 0 0 0; }}
 
-    /* lightbox */
+    /* Lightbox */
     .lb-overlay {{
-        position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999;
-        display: flex; align-items: center; justify-content: center;
+        position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999;
+        display: flex; align-items: center; justify-content: center; cursor: pointer;
     }}
     .lb-overlay img {{ max-width: 90vw; max-height: 90vh; border-radius: 12px; }}
+
+    /* Progress bar */
+    .stProgress > div > div > div {{ background: linear-gradient(90deg, {PRI}, {SEC}) !important; }}
 </style>
 """, unsafe_allow_html=True)
 
 # ── State ──
-if "page" not in st.session_state:
-    st.session_state.page = "select"
-if "modelo_sel" not in st.session_state:
-    st.session_state.modelo_sel = None
-if "resultados" not in st.session_state:
-    st.session_state.resultados = None
+for key in ["page", "modelo_sel", "resultados"]:
+    if key not in st.session_state:
+        st.session_state[key] = None if key != "page" else "select"
 
 # ── Models ──
 MODELOS = {
@@ -203,22 +242,6 @@ def conf_cls(pct):
     if pct >= 50: return "yellow"
     return "red"
 
-def make_csv(resultados, clases):
-    rows = []
-    for r in resultados:
-        probs_list = [float(p) * 100 for p in r["predicciones"]]
-        row = {
-            "Imagen": r["nombre"],
-            "Categoría": r["clase"],
-            "ID Clase": r["id_clase"],
-            "Confianza (%)": round(r["probabilidad"], 2),
-            "Invertida": "Sí" if r["invertida"] else "No",
-        }
-        for i, c in enumerate(clases):
-            row[f"Prob {c} (%)"] = round(probs_list[i], 2)
-        rows.append(row)
-    return pd.DataFrame(rows).to_csv(index=False).encode("utf-8")
-
 # ══════════════════════════════════════════════════
 #  PAGE: SELECT MODEL
 # ══════════════════════════════════════════════════
@@ -234,7 +257,7 @@ if st.session_state.page == "select":
     st.markdown(
         f'<div class="card" style="padding:1.5rem 2rem;">'
         f'<div class="card-title" style="font-size:1.15rem;justify-content:center;">🎯 Elegí un modelo de clasificación</div>'
-        f'<div class="card-sub" style="text-align:center;">Cada modelo fue entrenado para reconocer un tipo distinto de imagen. Seleccioná el que mejor se adapte a lo que querés clasificar.</div>',
+        f'<div class="card-sub" style="text-align:center;">Cada modelo fue entrenado para reconocer un tipo distinto de imagen.</div>',
         unsafe_allow_html=True
     )
 
@@ -292,30 +315,34 @@ elif st.session_state.page == "classify":
     clases = info["clases"]
 
     # ── Top bar ──
-    col_back, col_title, col_reset = st.columns([1, 5, 1])
-    with col_back:
-        if st.button("← Cambiar", key="btn_back"):
+    col1, col2, col3 = st.columns([1.4, 5, 1.4])
+    with col1:
+        st.markdown('<div class="sec-btn" style="padding-top:2px;">', unsafe_allow_html=True)
+        if st.button("← Cambiar modelo", key="btn_back"):
             st.session_state.page = "select"
             st.rerun()
-    with col_title:
+        st.markdown('</div>', unsafe_allow_html=True)
+    with col2:
         st.markdown(
-            f'<div style="display:flex;align-items:center;gap:0.7rem;padding:0.15rem 0;">'
+            f'<div style="display:flex;align-items:center;gap:0.7rem;justify-content:center;height:100%;">'
             f'<span style="font-size:1.2rem;font-weight:700;color:{TEXT};">{info["icono"]} {info["nombre"]}</span>'
-            f'<span style="font-size:0.75rem;background:rgba(56,189,248,0.1);color:{PRI};padding:0.15rem 0.7rem;'
-            f'border-radius:100px;border:1px solid rgba(56,189,248,0.15);font-weight:500;">✓ Activo</span>'
+            f'<span style="font-size:0.75rem;background:rgba(103,232,249,0.08);color:{PRI};padding:0.15rem 0.7rem;'
+            f'border-radius:100px;border:1px solid rgba(103,232,249,0.15);font-weight:500;">✓ Activo</span>'
             f'</div>', unsafe_allow_html=True
         )
-    with col_reset:
-        if st.button("🔄 Reset", key="btn_reset"):
+    with col3:
+        st.markdown('<div class="danger-btn" style="padding-top:2px;">', unsafe_allow_html=True)
+        if st.button("🔄 Limpiar", key="btn_reset"):
             st.session_state.resultados = None
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # ── Upload card ──
     st.markdown(
         f'<div class="card">'
         f'<div class="card-title">📤 Subí imágenes</div>'
         f'<div class="card-sub">Subí una o varias imágenes en formato PNG o JPG. '
-        f'El modelo las procesará automáticamente a 28×28 px en escala de grises.</div>',
+        f'El modelo las procesará a 28×28 px en escala de grises automáticamente.</div>',
         unsafe_allow_html=True
     )
 
@@ -336,17 +363,7 @@ elif st.session_state.page == "classify":
                 unsafe_allow_html=True
             )
 
-            accion, export = st.columns([1, 1])
-            with accion:
-                classify = st.button("🚀 Clasificar todas", key="btn_classify", use_container_width=True)
-            with export:
-                if st.session_state.get("resultados"):
-                    csv = make_csv(st.session_state.resultados, clases)
-                    st.download_button(
-                        "📥 Exportar CSV", csv,
-                        f"resultados_{model_key}.csv",
-                        "text/csv", use_container_width=True
-                    )
+            classify = st.button("🚀 Clasificar todas", key="btn_classify", use_container_width=True)
 
             if classify:
                 resultados = []
@@ -399,8 +416,8 @@ elif st.session_state.page == "classify":
         st.markdown(
             f'<div class="kpi-row">'
             f'<div class="kpi"><div class="nm">{len(resultados)}</div><div class="lb">Imágenes</div></div>'
-            f'<div class="kpi"><div class="nm blue">{avg_conf:.1f}%</div><div class="lb">Promedio</div></div>'
-            f'<div class="kpi"><div class="nm blue">{med_conf:.1f}%</div><div class="lb">Mediana</div></div>'
+            f'<div class="kpi"><div class="nm accent">{avg_conf:.1f}%</div><div class="lb">Promedio</div></div>'
+            f'<div class="kpi"><div class="nm accent">{med_conf:.1f}%</div><div class="lb">Mediana</div></div>'
             f'<div class="kpi"><div class="nm">{std_conf:.1f}%</div><div class="lb">Desviación</div></div>'
             f'</div>'
             f'<div class="kpi-row">'
@@ -446,9 +463,9 @@ elif st.session_state.page == "classify":
         # ── Individual results ──
         st.markdown(
             f'<div class="card">'
-            f'<div class="card-title">🔍 Resultados por imagen</div>'
-            f'<div class="card-sub">Cada tarjeta muestra la imagen original, cómo la "ve" el modelo (28×28), '
-            f'la categoría asignada, la confianza y las 3 clases más probables.</div>',
+            f'<div class="card-title">🔍 Informe por imagen</div>'
+            f'<div class="card-sub">Cada informe muestra el recorrido completo: imagen original → cómo la preprocesó el modelo → '
+            f'qué categoría asignó → qué tan seguro está → qué otras opciones consideró.</div>',
             unsafe_allow_html=True
         )
 
@@ -456,60 +473,87 @@ elif st.session_state.page == "classify":
         for i, r in enumerate(resultados):
             cl = conf_cls(r["probabilidad"])
             with cols[i % 2]:
-                st.markdown(
-                    f'<div class="res-card">'
-                    f'<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">'
-                    f'<span style="font-size:0.75rem;color:{MUTED};font-weight:500;">#{r["idx"]}</span>'
-                    f'<span style="font-weight:600;color:{TEXT};font-size:0.9rem;">{r["nombre"]}</span>'
-                    f'</div>'
-                    f'<div style="display:flex;gap:0.8rem;">'
-                    f'<div style="text-align:center;">'
-                    f'<img src="data:image/png;base64,{img_to_b64(r["imagen"])}" width="80" style="border-radius:6px;border:1px solid {BORDER};cursor:pointer;" '
-                    f'onclick="document.getElementById(\'lb-img\').src=this.src;document.getElementById(\'lb\').style.display=\'flex\';">'
-                    f'<div class="rl" style="margin-top:0.2rem;">Original</div>'
-                    f'</div>'
-                    f'<div style="text-align:center;">'
-                    f'<img src="data:image/png;base64,{img_to_b64(r["thumbnail"])}" width="80" style="border-radius:6px;border:1px solid {BORDER}55;image-rendering:pixelated;">'
-                    f'<div class="rl" style="margin-top:0.2rem;">28×28</div>'
-                    f'</div>'
-                    f'<div style="flex:1;">'
-                    f'<div class="rl">Categoría</div><div><span class="rcat">{r["clase"]}</span></div>'
-                    f'<div style="margin-top:0.4rem;"><div class="rl">Confianza</div>'
-                    f'<div class="rval {cl}">{r["probabilidad"]:.1f}%</div>'
-                    f'<div class="rbar"><div class="rbar-fill {cl}" style="width:{r["probabilidad"]}%;"></div></div></div>'
-                    f'</div></div>'
-                    f'<div style="display:flex;flex-wrap:wrap;gap:0.25rem;margin-top:0.5rem;padding-top:0.4rem;border-top:1px solid {BORDER}55;">'
-                    f'<span class="badge" title="La imagen se redimensionó a 28×28 píxeles">📐 28×28</span>'
-                    f'<span class="badge" title="Se convirtió a escala de grises (1 canal)">🌑 Grises</span>'
-                    f'<span class="badge" title="Se invirtieron los colores (fondo claro → oscuro)">{"🔄 Invertida" if r["invertida"] else "✅ Normal"}</span>'
-                    f'<span class="badge" title="Índice numérico de la clase asignada">ID: {r["id_clase"]}</span>'
-                    f'<span class="badge" title="Tamaño original de la imagen">{r["imagen"].width}×{r["imagen"].height}px</span>'
-                    f'</div></div>', unsafe_allow_html=True
-                )
+                invert_text = "🔄 Se invirtieron los colores (fondo claro → oscuro)" if r["invertida"] else "✅ Los colores ya estaban en el formato esperado"
 
                 if r["probabilidad"] >= 90:
-                    st.markdown(f'<div class="msg ok">✅ Muy seguro — "{r["clase"]}" con {r["probabilidad"]:.1f}%</div>', unsafe_allow_html=True)
+                    interpretacion = f'<div class="msg ok">✅ El modelo identificó esta imagen como <strong>"{r["clase"]}"</strong> con una confianza muy alta ({r["probabilidad"]:.1f}%). El resultado es confiable.</div>'
                 elif r["probabilidad"] >= 80:
-                    st.markdown(f'<div class="msg ok">✅ Buena confianza — {r["probabilidad"]:.1f}%</div>', unsafe_allow_html=True)
+                    interpretacion = f'<div class="msg ok">✅ El modelo clasificó esta imagen como <strong>"{r["clase"]}"</strong> con buena confianza ({r["probabilidad"]:.1f}%).</div>'
                 elif r["probabilidad"] >= 50:
-                    st.markdown(f'<div class="msg info">⚠️ Con dudas ({r["probabilidad"]:.1f}%) — revisá la imagen</div>', unsafe_allow_html=True)
+                    interpretacion = f'<div class="msg info">⚠️ El modelo tiene dudas. Cree que es <strong>"{r["clase"]}"</strong> pero solo con un {r["probabilidad"]:.1f}% de confianza. Revisá la imagen manualmente.</div>'
                 else:
-                    st.markdown(f'<div class="msg warn">❌ Baja confianza ({r["probabilidad"]:.1f}%) — probá con otra imagen</div>', unsafe_allow_html=True)
+                    interpretacion = f'<div class="msg warn">❌ El modelo no reconoce bien esta imagen. Solo alcanzó un {r["probabilidad"]:.1f}% de confianza en <strong>"{r["clase"]}"</strong>. Probá con una imagen más nítida y con mayor contraste.</div>'
 
-                # Top 3
+                st.markdown(
+                    f'<div class="res-card">'
+                    f'<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.7rem;padding-bottom:0.5rem;border-bottom:1px solid {BORDER}55;">'
+                    f'<span style="font-size:0.75rem;color:{MUTED};font-weight:500;">#{r["idx"]}</span>'
+                    f'<span style="font-weight:600;color:{TEXT};font-size:0.95rem;">{r["nombre"]}</span>'
+                    f'</div>'
+
+                    f'<div style="display:flex;gap:1rem;margin-bottom:0.7rem;">'
+                    f'<div style="text-align:center;">'
+                    f'<img src="data:image/png;base64,{img_to_b64(r["imagen"])}" width="90" style="border-radius:8px;border:1px solid {BORDER};cursor:pointer;" '
+                    f'onclick="document.getElementById(\'lb-img\').src=this.src;document.getElementById(\'lb\').style.display=\'flex\';">'
+                    f'<div style="font-size:0.6rem;color:{MUTED};margin-top:0.15rem;text-transform:uppercase;letter-spacing:0.06em;">Original</div>'
+                    f'<div style="font-size:0.6rem;color:{MUTED}66;">{r["imagen"].width}×{r["imagen"].height}px</div>'
+                    f'</div>'
+                    f'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">'
+                    f'<span style="color:{MUTED};font-size:1.2rem;">→</span>'
+                    f'<div style="font-size:0.6rem;color:{MUTED};margin-top:0.15rem;">Preprocesar</div>'
+                    f'</div>'
+                    f'<div style="text-align:center;">'
+                    f'<img src="data:image/png;base64,{img_to_b64(r["thumbnail"])}" width="90" style="border-radius:8px;border:1px solid {BORDER}55;image-rendering:pixelated;">'
+                    f'<div style="font-size:0.6rem;color:{MUTED};margin-top:0.15rem;text-transform:uppercase;letter-spacing:0.06em;">28×28 Gris</div>'
+                    f'<div style="font-size:0.6rem;color:{MUTED}66;">Lo que ve el modelo</div>'
+                    f'</div>'
+                    f'</div>'
+
+                    f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;padding:0.6rem;background:{BG};border-radius:10px;border:1px solid {BORDER}55;">'
+                    f'<div>'
+                    f'<div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:{MUTED};margin-bottom:0.15rem;">Categoría asignada</div>'
+                    f'<div><span class="rcat" style="font-size:1rem;">{r["clase"]}</span></div>'
+                    f'</div>'
+                    f'<div>'
+                    f'<div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:{MUTED};margin-bottom:0.15rem;">Nivel de confianza</div>'
+                    f'<div class="rval {cl}" style="font-size:1.4rem;">{r["probabilidad"]:.1f}%</div>'
+                    f'<div class="rbar"><div class="rbar-fill {cl}" style="width:{r["probabilidad"]}%;"></div></div>'
+                    f'</div>'
+                    f'</div>'
+
+                    f'{interpretacion}'
+
+                    f'<div style="margin-top:0.6rem;padding-top:0.5rem;border-top:1px solid {BORDER}55;">'
+                    f'<div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:{MUTED};margin-bottom:0.3rem;">📊 Otras clases que el modelo consideró posibles</div>',
+                    unsafe_allow_html=True
+                )
+
+                # Top 3 chart (Streamlit element, not HTML)
                 probs_list = [float(p) * 100 for p in r["predicciones"]]
                 sorted_idx = np.argsort(probs_list)[::-1][:3]
                 top3_df = pd.DataFrame({
                     "Clase": [clases[i] for i in sorted_idx],
-                    "Probabilidad": [probs_list[i] for i in sorted_idx]
+                    "Probabilidad (%)": [probs_list[i] for i in sorted_idx]
                 })
                 d = alt.Chart(top3_df).mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4, size=22).encode(
                     x=alt.X("Clase:N", sort=None, axis=alt.Axis(labelFontSize=10, labelColor=TEXT)),
-                    y=alt.Y("Probabilidad:Q", axis=alt.Axis(format='.1f', title=None, labelColor=TEXT, gridColor=BORDER)),
-                    color=alt.Color("Probabilidad:Q", scale=alt.Scale(domain=[0,100], range=[SURFACE2, PRI]), legend=None),
-                    tooltip=[alt.Tooltip("Clase:N"), alt.Tooltip("Probabilidad:Q", format='.1f')]
+                    y=alt.Y("Probabilidad (%):Q", axis=alt.Axis(format='.1f', title=None, labelColor=TEXT, gridColor=BORDER)),
+                    color=alt.Color("Probabilidad (%):Q", scale=alt.Scale(domain=[0,100], range=[SURFACE2, PRI]), legend=None),
+                    tooltip=[alt.Tooltip("Clase:N"), alt.Tooltip("Probabilidad (%):Q", format='.1f')]
                 ).properties(height=130).configure_view(strokeOpacity=0)
                 st.altair_chart(d, use_container_width=True)
+
+                # Pipeline badges as footer
+                st.markdown(
+                    f'<div style="display:flex;flex-wrap:wrap;gap:0.25rem;padding-top:0.4rem;border-top:1px solid {BORDER}55;">'
+                    f'<span class="badge" title="La imagen se redimensionó a 28×28 píxeles">📐 28×28</span>'
+                    f'<span class="badge" title="Se convirtió a escala de grises (1 canal)">🌑 Grises</span>'
+                    f'<span class="badge" title="Se invirtieron los colores (fondo claro → oscuro) para mejorar el contraste">{"🔄 Invertida" if r["invertida"] else "✅ Normal"}</span>'
+                    f'<span class="badge" title="Índice numérico de la clase asignada por el modelo">ID: {r["id_clase"]}</span>'
+                    f'</div>'
+                    f'</div>'
+                    f'</div>', unsafe_allow_html=True
+                )
 
         st.markdown('</div>', unsafe_allow_html=True)
 

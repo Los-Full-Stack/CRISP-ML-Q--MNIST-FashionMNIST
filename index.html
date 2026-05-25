@@ -1,11 +1,590 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+    <title>Sustentación de Proyecto: CNN & CRISP-ML(Q)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* CONFIGURACIÓN DE TEMAS DINÁMICOS */
+        .theme-light {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+        .theme-light .panel-card {
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+        }
+        .theme-light .text-muted { color: #334155; }
+        .theme-light .text-title { color: #0f172a; }
+        .theme-light .inner-bg { background-color: #f8fafc; border-color: #e2e8f0; }
+        
+        .theme-light::-webkit-scrollbar { width: 12px; }
+        .theme-light::-webkit-scrollbar-track { background: #f1f5f9; }
+        .theme-light::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; border: 3px solid #f1f5f9; }
+        .theme-light::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .theme-dark {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .theme-dark .panel-card {
+            background-color: #111927;
+            border-color: #1f293d;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        }
+        .theme-dark .text-muted { color: #94a3b8; }
+        .theme-dark .text-title { color: #ffffff; }
+        .theme-dark .inner-bg { background-color: #0d131f; border-color: #1e293b; }
+        
+        .theme-dark::-webkit-scrollbar { width: 12px; }
+        .theme-dark::-webkit-scrollbar-track { background: #090d16; }
+        .theme-dark::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 6px; border: 3px solid #090d16; }
+        .theme-dark::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+        .panel-card {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, background-color 0.3s ease;
+        }
+        .panel-card:hover {
+            transform: scale(1.01);
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-modal-fade {
+            animation: modalFadeIn 0.2s ease forwards;
+        }
+
+        .zoom-img {
+            cursor: zoom-in;
+            transition: filter 0.2s ease;
+        }
+        .zoom-img:hover {
+            filter: contrast(1.03) brightness(1.02);
+        }
+    </style>
 </head>
-<body>
-    hola
+<body class="theme-light antialiased min-h-screen pb-20 text-lg">
+
+    <div class="fixed bottom-8 left-8 z-50">
+        <button id="themeToggle" class="flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold w-14 h-14 rounded-full shadow-2xl transition-all active:scale-95 border border-white/10">
+            <i id="themeIcon" class="fa-solid fa-moon text-xl"></i>
+        </button>
+    </div>
+
+    <div class="inner-bg border-b h-16 flex items-center justify-between px-6 sm:px-12 text-sm font-semibold tracking-wide">
+        <div class="flex items-center space-x-4">
+            <span class="text-blue-600 font-extrabold uppercase text-base tracking-wider">Facultad de Ingeniería</span>
+            <span class="text-gray-300">|</span>
+            <span class="text-muted text-sm">Escuela Académica de Ingeniería de Sistemas e Informática</span>
+        </div>
+        <div class="hidden lg:flex items-center space-x-2 text-xs code-font bg-blue-500/10 px-3 py-1.5 rounded-md text-blue-600">
+            <span>PROYECTO: CRISP-ML(Q) & CNN</span>
+        </div>
+    </div>
+
+    <header class="max-w-7xl mx-auto px-6 pt-14 pb-8 text-center space-y-6">
+        <span class="inline-block px-5 py-2 text-sm font-black tracking-widest text-blue-600 bg-blue-500/10 rounded-full uppercase border border-blue-500/20">
+            Sustentación de Proyecto Técnico de Software
+        </span>
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-title leading-tight max-w-5xl mx-auto">
+            Clasificación Automática de Imágenes con <span class="text-blue-600">Redes Convolucionales (CNN)</span>
+        </h1>
+        <p class="text-xl sm:text-2xl text-muted max-w-4xl mx-auto font-normal leading-relaxed">
+            Ciclo de vida end-to-end industrializado bajo el estándar internacional de gobernanza <strong class="text-blue-600 font-bold">CRISP-ML(Q)</strong>.
+        </p>
+        
+        <div class="flex flex-wrap justify-center gap-4 pt-4">
+            <a href="https://github.com/Los-Full-Stack/CRISP-ML-Q--MNIST-FashionMNIST" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all active:scale-95 text-base tracking-wide border border-slate-700">
+                <i class="fa-brands fa-github text-xl"></i>
+                <span>Ver Repositorio GitHub</span>
+            </a>
+            <a href="https://crisp-ml-q--mnist-fashionmnist-mjtfcg7zjtnh9bwiryudbd.streamlit.app/" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all active:scale-95 text-base tracking-wide border border-emerald-400/20">
+                <i class="fa-solid fa-rocket text-xl"></i>
+                <span>Ir a la App Lanzada</span>
+            </a>
+        </div>
+        
+        <div class="pt-6 flex flex-wrap justify-center gap-8 text-base font-medium text-muted border-t border-gray-300/40 max-w-2xl mx-auto">
+            <div><i class="fa-solid fa-user-tie text-blue-600 mr-2 text-xl"></i><strong>Docente:</strong> Hugo Espetia Huamanga</div>
+            <div><i class="fa-solid fa-location-dot text-blue-600 mr-2 text-xl"></i>Cusco, Perú — 2026</div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 mt-12 space-y-16">
+
+        <section class="panel-card border rounded-3xl p-8 sm:p-12 space-y-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-4 h-10 bg-blue-600 rounded-full"></div>
+                <h2 class="text-3xl sm:text-4xl font-black text-title tracking-tight">0. Estructura del Ciclo de Vida: CRISP-ML(Q)</h2>
+            </div>
+            <p class="text-lg sm:text-xl text-muted leading-relaxed">
+                Implementación rigurosa que añade la directiva de <strong>Aseguramiento de Calidad (Q)</strong> a cada iteración para mitigar riesgos operacionales y monitorizar el sesgo de datos en producción de forma autónoma.
+            </p>
+            <div class="inner-bg rounded-2xl p-4 border">
+                <img src="images/crisp_ml_q_infographic.png" alt="Ciclo de Vida Metodológico CRISP-ML(Q)" class="zoom-img w-full rounded-xl" onerror="this.src='https://placehold.co/1200x550/e2e8f0/0f172a?text=images/crisp_ml_q_infographic.png'">
+            </div>
+            <p class="text-sm text-center text-muted font-medium italic"><i class="fa-solid fa-magnifying-glass-plus text-blue-600 mr-1.5"></i> Haga clic sobre el diagrama para abrir la vista interactiva con zoom táctil, botones o rueda.</p>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            
+            <section class="panel-card border rounded-3xl p-8 sm:p-10 space-y-8 flex flex-col justify-between">
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-4">
+                        <span class="bg-blue-600 text-white font-mono text-sm font-black px-3 py-1.5 rounded-lg">FASE 1</span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-title tracking-tight">Comprensión del Negocio</h2>
+                    </div>
+                    
+                    <div class="border-l-4 border-l-blue-600 pl-5 space-y-3">
+                        <h3 class="font-black text-title text-lg uppercase tracking-wide">Caso I &bull; Reconocimiento de Dígitos (MNIST)</h3>
+                        <p class="text-base text-muted leading-relaxed">
+                            <strong>El Problema:</strong> El procesamiento y digitalización manual de documentos manuscritos genera altos costos de operación, ineficiencias de flujo y fallos críticos de transcripción humana en el sector bancario.
+                        </p>
+                        <p class="text-sm text-blue-600 font-semibold font-mono bg-blue-500/5 py-1 px-3 rounded w-max">
+                            Objetivo: Clasificador multiclase automático (0-9).
+                        </p>
+                    </div>
+
+                    <div class="border-l-4 border-l-purple-600 pl-5 space-y-3 pt-2">
+                        <h3 class="font-black text-title text-lg uppercase tracking-wide">Caso II &bull; Artículos de Moda (Fashion MNIST)</h3>
+                        <p class="text-base text-muted leading-relaxed">
+                            <strong>El Problema:</strong> La categorización manual de miles de artículos entrantes de proveedores en e-commerce penaliza el Time-to-Market, introduce inconsistencias de inventario en el catálogo y daña la retención de usuarios.
+                        </p>
+                        <p class="text-sm text-purple-600 font-semibold font-mono bg-purple-500/5 py-1 px-3 rounded w-max">
+                            Objetivo: Reconocimiento automatizado en 10 categorías de ropa.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 pt-6 border-t font-mono text-sm">
+                    <div class="bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/25 text-center">
+                        <span class="text-muted block text-xs font-sans uppercase font-bold tracking-wider mb-1">Métrica Éxito MNIST</span>
+                        <strong class="text-emerald-600 text-lg sm:text-2xl font-black">Accuracy $\ge$ 99.0%</strong>
+                    </div>
+                    <div class="bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/25 text-center">
+                        <span class="text-muted block text-xs font-sans uppercase font-bold tracking-wider mb-1">Métrica Éxito Fashion</span>
+                        <strong class="text-emerald-600 text-lg sm:text-2xl font-black">Accuracy $\ge$ 90.0%</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-card border rounded-3xl p-8 sm:p-10 space-y-6">
+                <div class="flex items-center space-x-4">
+                    <span class="bg-blue-600 text-white font-mono text-sm font-black px-3 py-1.5 rounded-lg">FASE 2</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-title tracking-tight">Comprensión de los Datos</h2>
+                </div>
+                <p class="text-base text-muted leading-relaxed">
+                    Los dos conjuntos se adquieren directamente de los repositorios de desarrollo de Keras. Comparten dimensiones y homogeneidad matemática estructural estricta:
+                </p>
+                
+                <div class="grid grid-cols-3 gap-3 text-center font-mono text-sm bg-black/5 p-4 rounded-2xl border">
+                    <div><span class="text-muted block text-xs font-sans mb-1 uppercase">Entrenamiento</span><strong class="text-title text-base sm:text-lg font-black">60k imágenes</strong></div>
+                    <div><span class="text-muted block text-xs font-sans mb-1 uppercase">Prueba (Test)</span><strong class="text-title text-base sm:text-lg font-black">10k imágenes</strong></div>
+                    <div><span class="text-muted block text-xs font-sans mb-1 uppercase">Resolución Fija</span><strong class="text-title text-base sm:text-lg font-black">$28\times28$ px</strong></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 pt-2">
+                    <div class="space-y-2">
+                        <span class="text-sm font-mono font-bold text-muted block text-center">Matrices de Trazos (MNIST)</span>
+                        <img src="images/mnist_samples.png" alt="Muestras MNIST" class="zoom-img w-full rounded-xl bg-black p-1 border shadow-inner" onerror="this.src='https://placehold.co/450x180/000000/ffffff?text=MNIST+Samples'">
+                    </div>
+                    <div class="space-y-2">
+                        <span class="text-sm font-mono font-bold text-muted block text-center">Catálogo de Moda (Fashion)</span>
+                        <img src="images/fashion_samples.png" alt="Muestras Fashion MNIST" class="zoom-img w-full rounded-xl bg-black p-1 border shadow-inner" onerror="this.src='https://placehold.co/450x180/000000/ffffff?text=Fashion+Samples'">
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="panel-card border rounded-3xl p-8 sm:p-12 space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6">
+                <div class="flex items-center space-x-4">
+                    <span class="bg-blue-600 text-white font-mono text-sm font-black px-3 py-1.5 rounded-lg">FASE 3</span>
+                    <h2 class="text-2xl sm:text-4xl font-black text-title tracking-tight">Preparación de Datos y Diseño Arquitectónico</h2>
+                </div>
+                <div class="flex gap-4 font-mono text-sm bg-black/5 px-4 py-2.5 rounded-2xl border text-muted">
+                    <div>Optimizar: <strong class="text-blue-600">Adam</strong></div>
+                    <div>Función Pérdida: <strong class="text-purple-600">Categorical Crossentropy</strong></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-base">
+                <div class="p-6 inner-bg rounded-2xl border space-y-4">
+                    <h3 class="font-black text-title text-lg flex items-center text-blue-600"><i class="fa-solid fa-gears mr-2"></i>1. Pipeline de Transformación</h3>
+                    <p class="text-muted leading-relaxed text-sm sm:text-base">
+                        <strong>Reshaping Tensor:</strong> Inserción del canal explícito de luminancia requerido por TensorFlow: $(60000, 28, 28, 1)$.<br><br>
+                        <strong>Normalización MinMax:</strong> Escalamiento matemático $X_{norm} = X / 255.0$ para unificar el rango de los píxeles a flotantes de 32 bits entre $[0.0, 1.0]$. Esto previene la saturación de activaciones y acelera drásticamente la convergencia.
+                    </p>
+                </div>
+
+                <div class="p-6 inner-bg rounded-2xl border space-y-4">
+                    <h3 class="font-black text-title text-lg flex items-center text-purple-600"><i class="fa-solid fa-layer-group mr-2"></i>2. Bloques de Extracción (CNN)</h3>
+                    <p class="text-muted leading-relaxed text-sm sm:text-base">
+                        <strong>Bloque Inicial:</strong> Capa Conv2D con 32 filtros ($3\times3$) y función de activación $f(x) = \max(0, x)$ (ReLU) para aislar mapas de bordes. Reducción espacial MaxPooling ($2\times2$) que condensa las dimensiones a la mitad ($14\times14$).<br><br>
+                        <strong>Bloque Profundo:</strong> Incremento a 64 filtros convolucionales ($3\times3$) para aprender patrones geométricos de alto nivel. Segundo submuestreo Max Pooling que define una salida de $7\times7$.
+                    </p>
+                </div>
+
+                <div class="p-6 inner-bg rounded-2xl border space-y-4">
+                    <h3 class="font-black text-title text-lg flex items-center text-pink-600"><i class="fa-solid fa-network-wired mr-2"></i>3. Regularización y Logits</h3>
+                    <p class="text-muted leading-relaxed text-sm sm:text-base">
+                        <strong>Flatten & Densa:</strong> Desenrollado lineal del tensor tridimensional ($7\times7\times64$) en un vector compacto de $3,136$ elementos acoplado a una capa densa de 128 neuronas.<br><br>
+                        <strong>Dropout del 40%:</strong> Desconexión estocástica del $40\%$ de los nodos en cada iteración de entrenamiento. Rompe la co-adaptación de weights previniendo el Overfitting de manera drástica.<br><br>
+                        <strong>Softmax:</strong> Logits mapeados en una distribución normalizada que suma exactamente $1.0$ ($100\%$).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel-card border rounded-3xl p-8 sm:p-12 space-y-8">
+            <div class="flex items-center space-x-4">
+                <span class="bg-blue-600 text-white font-mono text-sm font-black px-3 py-1.5 rounded-lg">FASE 4</span>
+                <h2 class="text-2xl sm:text-4xl font-black text-title tracking-tight">Evaluación Analítica y Diagnóstico Estadístico</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div class="inner-bg rounded-2xl p-6 sm:p-8 border space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <h3 class="font-black text-title text-lg sm:text-xl">Auditoría Caso MNIST (Dígitos)</h3>
+                        <span class="bg-emerald-500 text-white text-xs sm:text-sm px-3 py-1 rounded-md font-mono font-bold">Test Acc: 99.19%</span>
+                    </div>
+                    <p class="text-base text-muted leading-relaxed">
+                        El paralelismo decreciente de las curvas de costo (Loss final de $0.0267$) ratifica un **Ajuste Óptimo (Good Fit)**. Las escasas confusiones se concentran de forma marginal en trazos manuales ambiguos entre los pares geométricos $(3, 8)$ y $(4, 9)$.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <img src="images/mnist_curves.png" alt="Curvas de Aprendizaje MNIST" class="zoom-img w-full rounded-xl bg-black border" onerror="this.src='https://placehold.co/400x250/000000/ffffff?text=MNIST+Curves'">
+                        <img src="images/mnist_confusion.png" alt="Matriz de Confusión MNIST" class="zoom-img w-full rounded-xl bg-black border" onerror="this.src='https://placehold.co/400x250/000000/ffffff?text=MNIST+Confusion'">
+                    </div>
+                </div>
+
+                <div class="inner-bg rounded-2xl p-6 sm:p-8 border space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <h3 class="font-black text-title text-lg sm:text-xl">Auditoría Caso Fashion MNIST (Moda)</h3>
+                        <span class="bg-emerald-500 text-white text-xs sm:text-sm px-3 py-1 rounded-md font-mono font-bold">Test Acc: 90.50%</span>
+                    </div>
+                    <p class="text-base text-muted leading-relaxed">
+                        Supera el requerimiento original del negocio ($90.0\%$). Consolidó un costo de error de $0.2644$. El mapa calórico revela un comportamiento óptimo y perfecto en artículos con siluetas muy distintivas como Pantalones ($983$ aciertos) y Bolsos ($975$ aciertos).
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <img src="images/fashion_curves.png" alt="Curvas de Aprendizaje Fashion MNIST" class="zoom-img w-full rounded-xl bg-black border" onerror="this.src='https://placehold.co/400x250/000000/ffffff?text=Fashion+Curves'">
+                        <img src="images/fashion_confusion.png" alt="Matriz de Confusión Fashion MNIST" class="zoom-img w-full rounded-xl bg-black border" onerror="this.src='https://placehold.co/400x250/000000/ffffff?text=Fashion+Confusion'">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel-card border rounded-3xl p-8 sm:p-12 space-y-8">
+            <div class="flex items-center space-x-4">
+                <span class="bg-blue-600 text-white font-mono text-sm font-black px-3 py-1.5 rounded-lg">FASE 5</span>
+                <h2 class="text-2xl sm:text-4xl font-black text-title tracking-tight">Despliegue e Infraestructura Web de Producción</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 items-center">
+                <div class="lg:col-span-1 space-y-5 text-base text-muted">
+                    <p class="leading-relaxed">
+                        Transición directa de los artefactos de aprendizaje serializados (<code class="code-font">.keras</code>) desde Google Colab hacia una arquitectura en la nube servida por **Streamlit Community Cloud** mapeada al repositorio central.
+                    </p>
+                    <ul class="space-y-4 text-sm sm:text-base pl-1">
+                        <li class="flex items-start"><i class="fa-solid fa-square-poll-vertical text-blue-600 mr-3 text-xl mt-0.5"></i> <div><strong>1. Capa Interfaz:</strong> Menú dinámico lateral en Streamlit y componente receptor <code class="code-font">st.file_uploader</code> para imágenes PNG y JPEG.</div></li>
+                        <li class="flex items-start"><i class="fa-solid fa-wand-magic-sparkles text-purple-600 mr-3 text-xl mt-0.5"></i> <div><strong>2. Capa Preprocesamiento:</strong> Conversión RGB a escala de grises mediante fórmula de luminancia ITU-R $0.299R+0.587G+0.114B$ e interpolación bilineal fija a $28\times28$ píxeles.</div></li>
+                        <li class="flex items-start"><i class="fa-solid fa-shield-virus text-amber-600 mr-3 text-xl mt-0.5"></i> <div><strong>Defensa de Producción:</strong> Inversión matemática automática matricial lineal ($X_{final} = 255 - X_{original}$) si el usuario ingresa fondos claros, neutralizando fallos catastróficos del modelo.</div></li>
+                        <li class="flex items-start"><i class="fa-solid fa-memory text-emerald-600 mr-3 text-xl mt-0.5"></i> <div><strong>3. Capa Inferencia:</strong> Carga de pesos optimizada en caché persistente (<code class="code-font">@st.cache_resource</code>) eliminando cuellos de botella de E/S de disco.</div></li>
+                    </ul>
+                </div>
+                <div class="lg:col-span-2 inner-bg border p-4 rounded-2xl">
+                    <span class="text-sm font-mono text-muted block mb-3 text-center">Figura 3: Pipeline de transformación y flujo de capas lógicas en backend</span>
+                    <img src="images/software_architecture.png" alt="Arquitectura de Software Completa" class="zoom-img w-full rounded-xl bg-slate-950 p-2 border" onerror="this.src='https://placehold.co/750x400/0f172a/ffffff?text=images/software_architecture.png'">
+                </div>
+            </div>
+        </section>
+
+        <section class="panel-card border rounded-3xl p-8 sm:p-12 space-y-8">
+            <div class="flex items-center space-x-4">
+                <span class="bg-blue-600 text-white font-mono text-sm font-black px-3 py-1.5 rounded-lg">FASE 6</span>
+                <h2 class="text-2xl sm:text-4xl font-black text-title tracking-tight">Monitoreo y Protocolos de Contingencia</h2>
+            </div>
+            
+            <div class="overflow-x-auto rounded-2xl border">
+                <table class="w-full text-left border-collapse text-base">
+                    <thead>
+                        <tr class="bg-blue-600 text-white font-bold text-sm tracking-wider uppercase">
+                            <th class="p-5">Nivel de Control</th>
+                            <th class="p-5">Métrica Monitoreada</th>
+                            <th class="p-5">Cota de Infracción</th>
+                            <th class="p-5">Acción Automatizada de Contingencia</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y font-mono text-sm sm:text-base bg-black/5">
+                        <tr class="hover:bg-blue-500/5">
+                            <td class="p-5 font-sans font-bold text-title">Infraestructura</td>
+                            <td class="p-5">Latencia de Inferencia</td>
+                            <td class="p-5 text-amber-600 font-bold">&gt; 15 ms / petición</td>
+                            <td class="p-5 font-sans text-muted">Optimización de caché intermedia y reescalado de contenedores en la nube.</td>
+                        </tr>
+                        <tr class="hover:bg-blue-500/5">
+                            <td class="p-5 font-sans font-bold text-title">Servidor Web</td>
+                            <td class="p-5">Tasa Error HTTP</td>
+                            <td class="p-5 text-amber-600 font-bold">&gt; 1% respuestas 5xx</td>
+                            <td class="p-5 font-sans text-muted">Disparo e instanciación de script de Healthcheck para reinicio de servicio.</td>
+                        </tr>
+                        <tr class="hover:bg-blue-500/5">
+                            <td class="p-5 font-sans font-bold text-title">Calidad de Datos</td>
+                            <td class="p-5">Data Drift (Sesgo)</td>
+                            <td class="p-5 text-amber-600 font-bold">Índice $PSI > 0.25$</td>
+                            <td class="p-5 font-sans text-muted">Test de Kolmogorov-Smirnov sobre distribuciones de brillo; alerta al equipo de Datos.</td>
+                        </tr>
+                        <tr class="hover:bg-blue-500/5">
+                            <td class="p-5 font-sans font-bold text-title">Modelo ML</td>
+                            <td class="p-5">Degradación Accuracy</td>
+                            <td class="p-5 text-red-500 font-bold">&lt; 98% (MNIST) / &lt; 89% (Fashion)</td>
+                            <td class="p-5 font-sans text-blue-600 font-black">Llamada y ejecución inmediata del pipeline automatizado de reentrenamiento.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-muted leading-relaxed">
+                <div class="p-6 inner-bg border rounded-2xl space-y-2">
+                    <h4 class="font-black text-title text-lg text-blue-600 uppercase tracking-wider"><i class="fa-solid fa-server mr-2"></i>Data Logging & Reentrenamiento Semestral</h4>
+                    <p>Las muestras que disparan el umbral de baja confianza de Softmax ($< 80\%$) se capturan de forma anonimizada. Un orquestador automatizado toma el dataset histórico, indexa el lote de producción y reajusta los pesos de la CNN durante 8 épocas generando un artefacto versionado bajo nomenclatura semántica estricta.</p>
+                </div>
+                <div class="p-6 inner-bg border rounded-2xl space-y-2">
+                    <h4 class="font-black text-title text-lg text-red-600 uppercase tracking-wider"><i class="fa-solid fa-rotate-left mr-2"></i>Protocolo de Contingencia (Rollback Instantáneo)</h4>
+                    <p>Si un nuevo binario inyectado colapsa los tiempos de respuesta o altera las tasas lógicas HTTP, los controladores de integración continua (CI/CD) desvían los punteros de inferencia del servidor Streamlit a la versión estable anterior (<code class="code-font">v1.0.keras</code>) en un intervalo inferior a 60 segundos.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-20 border-t py-12 text-center text-sm font-mono tracking-wide text-muted">
+        <p>Escuela Académica de Ingeniería de Sistemas e Informática &bull; Sustentación Técnica Oficial</p>
+        <p class="text-gray-500 mt-1 text-xs">Cusco, Perú — Año de la Esperanza y el Fortalecimiento de la Democracia (2026)</p>
+    </footer>
+
+        <div id="imageModal" class="fixed inset-0 z-50 hidden bg-black/95 flex items-center justify-center backdrop-blur-md p-4 transition-opacity duration-300 select-none">
+        <div class="absolute top-6 right-6 flex items-center space-x-4 z-50">
+            <span class="text-xs font-mono text-gray-300 bg-slate-900/90 px-4 py-2 rounded-full border border-gray-700/60 shadow-xl hidden md:inline-block"><i class="fa-solid fa-computer-mouse text-blue-500 mr-2"></i>Rueda del mouse o botones para Zoom | Arrastre para desplazar</span>
+            <button id="closeModal" class="p-3 bg-slate-900/90 text-gray-400 hover:text-white border border-gray-700 hover:border-gray-600 rounded-full shadow-xl transition-all active:scale-90"><i class="fa-solid fa-xmark px-1 text-xl"></i></button>
+        </div>
+
+        <div class="absolute bottom-8 left-8 z-50">
+            <span id="zoomLevel" class="text-sm font-mono font-bold text-white bg-slate-900/90 px-4 py-2 rounded-xl border border-gray-700/60 shadow-xl">100%</span>
+        </div>
+        
+        <div class="absolute bottom-8 right-8 flex flex-col space-y-3 z-50">
+            <button id="zoomInBtn" class="w-12 h-12 bg-slate-900/90 hover:bg-slate-800 text-gray-300 hover:text-white border border-gray-700 rounded-xl shadow-2xl flex items-center justify-center transition-all active:scale-90">
+                <i class="fa-solid fa-plus text-lg"></i>
+            </button>
+            <button id="zoomOutBtn" class="w-12 h-12 bg-slate-900/90 hover:bg-slate-800 text-gray-300 hover:text-white border border-gray-700 rounded-xl shadow-2xl flex items-center justify-center transition-all active:scale-90">
+                <i class="fa-solid fa-minus text-lg"></i>
+            </button>
+            <button id="resetZoomBtn" class="w-12 h-12 bg-slate-900/90 hover:bg-slate-800 text-gray-300 hover:text-white border border-gray-700 rounded-xl shadow-2xl flex items-center justify-center transition-all active:scale-90 text-xs font-bold">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+        </div>
+
+        <div id="modalWrapper" class="overflow-hidden max-w-full max-h-full flex items-center justify-center cursor-grab active:cursor-grabbing">
+            <img id="modalImg" src="" alt="Zoom" class="max-w-full max-h-[85vh] object-contain pointer-events-none" style="transform-origin: 0 0;">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            const modalWrapper = document.getElementById('modalWrapper');
+            const closeBtn = document.getElementById('closeModal');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+
+            // 1. CONTROL DE INVERSIÓN DE TEMA EN CALIENTE
+            themeToggle.addEventListener('click', () => {
+                if (body.classList.contains('theme-light')) {
+                    body.classList.remove('theme-light');
+                    body.classList.add('theme-dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    body.classList.remove('theme-dark');
+                    body.classList.add('theme-light');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            });
+
+            // 2. MOTOR DE ZOOM INTERACTIVO INTEGRAL (MOUSEWHEEL + BOTONES + ARRASTRE + TÁCTIL)
+            let scale = 1;
+            let isDragging = false;
+            let startX = 0, startY = 0;
+            let translateX = 0, translateY = 0;
+            let imgNaturalW = 0, imgNaturalH = 0;
+            const ZOOM_STEP = 0.5;
+            const MAX_ZOOM = 8;
+            const MIN_ZOOM = 1;
+
+            const zoomLevel = document.getElementById('zoomLevel');
+            const resetZoomBtn = document.getElementById('resetZoomBtn');
+
+            function clampPan() {
+                if (scale === 1) { translateX = 0; translateY = 0; return; }
+                const wrapperRect = modalWrapper.getBoundingClientRect();
+                const displayW = modalImg.clientWidth * scale;
+                const displayH = modalImg.clientHeight * scale;
+                const maxTx = Math.max(0, (displayW - wrapperRect.width) / 2);
+                const maxTy = Math.max(0, (displayH - wrapperRect.height) / 2);
+                translateX = Math.min(maxTx, Math.max(-maxTx, translateX));
+                translateY = Math.min(maxTy, Math.max(-maxTy, translateY));
+            }
+
+            function updateTransform() {
+                clampPan();
+                modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                zoomLevel.textContent = Math.round(scale * 100) + '%';
+            }
+
+            function doZoom(newScale, cursorX, cursorY) {
+                const oldScale = scale;
+                scale = Math.min(Math.max(newScale, MIN_ZOOM), MAX_ZOOM);
+                if (cursorX !== undefined && cursorY !== undefined && oldScale !== 1) {
+                    const ratio = 1 - scale / oldScale;
+                    translateX += (cursorX - modalWrapper.getBoundingClientRect().left - modalWrapper.clientWidth / 2) * ratio;
+                    translateY += (cursorY - modalWrapper.getBoundingClientRect().top - modalWrapper.clientHeight / 2) * ratio;
+                }
+                if (scale === 1) { translateX = 0; translateY = 0; }
+                updateTransform();
+            }
+
+            document.querySelectorAll('.zoom-img').forEach(img => {
+                img.addEventListener('click', () => {
+                    modalImg.src = img.src;
+                    modalImg.alt = img.alt;
+                    modal.classList.remove('hidden');
+                    scale = 1; translateX = 0; translateY = 0;
+                    updateTransform();
+                });
+            });
+
+            modalImg.addEventListener('load', () => {
+                modalImg.classList.add('animate-modal-zoom');
+                imgNaturalW = modalImg.naturalWidth;
+                imgNaturalH = modalImg.naturalHeight;
+                scale = 1; translateX = 0; translateY = 0;
+                updateTransform();
+            });
+
+            const hideModal = () => {
+                modal.classList.add('hidden');
+                modalImg.classList.remove('animate-modal-zoom');
+            };
+            closeBtn.addEventListener('click', hideModal);
+            modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+
+            zoomInBtn.addEventListener('click', (e) => { e.stopPropagation(); doZoom(scale + ZOOM_STEP); });
+            zoomOutBtn.addEventListener('click', (e) => { e.stopPropagation(); doZoom(scale - ZOOM_STEP); });
+            resetZoomBtn.addEventListener('click', (e) => { e.stopPropagation(); scale = 1; translateX = 0; translateY = 0; updateTransform(); });
+
+            modalWrapper.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP;
+                doZoom(scale + delta, e.clientX, e.clientY);
+            }, { passive: false });
+
+            let lastTouchDist = 0, lastTouchCX = 0, lastTouchCY = 0;
+            modalWrapper.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    lastTouchDist = Math.hypot(dx, dy);
+                    lastTouchCX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                    lastTouchCY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                }
+            }, { passive: false });
+
+            modalWrapper.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const dist = Math.hypot(dx, dy);
+                    if (lastTouchDist > 0) {
+                        const newScale = scale * (dist / lastTouchDist);
+                        doZoom(newScale);
+                    }
+                    lastTouchDist = dist;
+                } else if (e.touches.length === 1 && scale > 1) {
+                    const cx = e.touches[0].clientX;
+                    const cy = e.touches[0].clientY;
+                    if (lastTouchDist === 0) {
+                        translateX += (cx - lastTouchCX);
+                        translateY += (cy - lastTouchCY);
+                    }
+                    lastTouchCX = cx;
+                    lastTouchCY = cy;
+                    lastTouchDist = 0;
+                    updateTransform();
+                }
+            }, { passive: false });
+
+            modalWrapper.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) lastTouchDist = 0;
+            });
+
+            modalWrapper.addEventListener('mousedown', (e) => {
+                if (scale === 1) return;
+                isDragging = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                updateTransform();
+            });
+
+            window.addEventListener('mouseup', () => isDragging = false);
+
+            document.addEventListener('keydown', (e) => {
+                if (modal.classList.contains('hidden')) return;
+                if (e.key === 'Escape') hideModal();
+                if (e.key === '+' || e.key === '=') { e.preventDefault(); doZoom(scale + ZOOM_STEP); }
+                if (e.key === '-') { e.preventDefault(); doZoom(scale - ZOOM_STEP); }
+                if (e.key === '0') { e.preventDefault(); scale = 1; translateX = 0; translateY = 0; updateTransform(); }
+            });
+        });
+    </script>
 </body>
 </html>
